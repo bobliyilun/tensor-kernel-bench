@@ -1,0 +1,23 @@
+# Roadmap
+
+- [x] Rectangular naive matrix-multiplication reference
+- [x] Rectangular tiled matrix-multiplication reference
+- [x] Deterministic correctness and median-latency benchmark
+- [ ] Add transposed-right-hand-side layout
+- [ ] Benchmark tile-size sensitivity
+- [ ] Add batched matrix multiplication
+- [ ] Add fused bias epilogue
+- [ ] Add ReLU and GELU epilogues
+- [ ] Add row-wise softmax reference
+- [ ] Add numerically stable online softmax
+- [ ] Add layer-normalization reference
+- [ ] Add causal attention reference
+- [ ] Add operation and memory-traffic estimates
+- [ ] Add CSV benchmark export
+- [ ] Add machine-readable benchmark regression thresholds
+- [ ] Add optional NumPy backend
+- [ ] Add optional PyTorch eager backend
+- [ ] Add optional torch.compile comparison
+- [ ] Add optional Triton matmul kernel
+- [ ] Publish backend comparison with hardware metadata
+
