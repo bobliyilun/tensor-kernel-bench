@@ -28,6 +28,20 @@ def matmul(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) ->
     return output
 
 
+def matmul_transposed_right(
+    left: Sequence[Sequence[float]], right_transposed: Sequence[Sequence[float]]
+) -> Matrix:
+    """Multiply ``left`` by a right-hand side stored as ``[n][k]``."""
+    m, k = _shape(left)
+    n, right_k = _shape(right_transposed)
+    if k != right_k:
+        raise ValueError("inner dimensions must match")
+    return [
+        [sum(left[i][p] * right_transposed[j][p] for p in range(k)) for j in range(n)]
+        for i in range(m)
+    ]
+
+
 def tiled_matmul(
     left: Sequence[Sequence[float]], right: Sequence[Sequence[float]], tile: int = 16
 ) -> Matrix:
@@ -49,8 +63,28 @@ def tiled_matmul(
     return output
 
 
+def tiled_matmul_transposed_right(
+    left: Sequence[Sequence[float]], right_transposed: Sequence[Sequence[float]], tile: int = 16
+) -> Matrix:
+    """Tiled multiplication with a right-hand side stored as ``[n][k]``."""
+    m, k = _shape(left)
+    n, right_k = _shape(right_transposed)
+    if k != right_k:
+        raise ValueError("inner dimensions must match")
+    if tile <= 0:
+        raise ValueError("tile must be positive")
+    output = [[0.0] * n for _ in range(m)]
+    for ii in range(0, m, tile):
+        for jj in range(0, n, tile):
+            for pp in range(0, k, tile):
+                for i in range(ii, min(ii + tile, m)):
+                    for j in range(jj, min(jj + tile, n)):
+                        for p in range(pp, min(pp + tile, k)):
+                            output[i][j] += left[i][p] * right_transposed[j][p]
+    return output
+
+
 def max_abs_difference(left: Matrix, right: Matrix) -> float:
     if _shape(left) != _shape(right):
         raise ValueError("matrix shapes must match")
     return max(abs(a - b) for row_a, row_b in zip(left, right) for a, b in zip(row_a, row_b))
-

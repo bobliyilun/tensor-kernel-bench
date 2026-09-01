@@ -2,7 +2,10 @@
 
 An experimental CPU reference lab for tensor-kernel correctness and benchmarking. The baseline compares naive and tiled matrix multiplication using deterministic inputs and no third-party dependencies.
 
-The pure-Python implementation is deliberately a correctness oracle. Native, NumPy, and Triton backends are roadmap items rather than implied current capabilities.
+The pure-Python implementation is deliberately a correctness oracle. It includes
+naive and tiled kernels for conventional `[k][n]` right-hand-side storage plus
+pre-transposed `[n][k]` storage. Native, NumPy, and Triton backends are roadmap
+items rather than implied current capabilities.
 
 ## Run
 
@@ -12,4 +15,3 @@ python3 -m unittest -v
 ```
 
 See [ROADMAP.md](ROADMAP.md) for kernel and backend milestones.
-

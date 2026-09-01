@@ -3,7 +3,7 @@
 - [x] Rectangular naive matrix-multiplication reference
 - [x] Rectangular tiled matrix-multiplication reference
 - [x] Deterministic correctness and median-latency benchmark
-- [ ] Add transposed-right-hand-side layout
+- [x] Add transposed-right-hand-side layout
 - [ ] Benchmark tile-size sensitivity
 - [ ] Add batched matrix multiplication
 - [ ] Add fused bias epilogue
@@ -20,4 +20,3 @@
 - [ ] Add optional torch.compile comparison
 - [ ] Add optional Triton matmul kernel
 - [ ] Publish backend comparison with hardware metadata
-
