@@ -4,7 +4,7 @@
 - [x] Rectangular tiled matrix-multiplication reference
 - [x] Deterministic correctness and median-latency benchmark
 - [x] Add transposed-right-hand-side layout
-- [ ] Benchmark tile-size sensitivity
+- [x] Benchmark tile-size sensitivity
 - [ ] Add batched matrix multiplication
 - [ ] Add fused bias epilogue
 - [ ] Add ReLU and GELU epilogues

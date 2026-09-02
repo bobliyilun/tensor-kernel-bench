@@ -1,5 +1,7 @@
+import argparse
 import unittest
 
+from benchmark import tile_sizes
 from kernels import (
     matmul,
     matmul_transposed_right,
@@ -10,6 +12,13 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_tile_sizes_parses_and_rejects_invalid_values(self):
+        self.assertEqual(tile_sizes("1,4,16"), [1, 4, 16])
+        with self.assertRaises(argparse.ArgumentTypeError):
+            tile_sizes("0,4")
+        with self.assertRaises(argparse.ArgumentTypeError):
+            tile_sizes("four")
+
     def test_tiled_matches_reference_for_rectangular_input(self):
         left = [[1.0, 2.0, 3.0], [-1.0, 0.0, 4.0]]
         right = [[2.0, 1.0], [0.0, -1.0], [3.0, 2.0]]
