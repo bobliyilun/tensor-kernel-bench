@@ -5,7 +5,7 @@
 - [x] Deterministic correctness and median-latency benchmark
 - [x] Add transposed-right-hand-side layout
 - [x] Benchmark tile-size sensitivity
-- [ ] Add batched matrix multiplication
+- [x] Add batched matrix multiplication
 - [ ] Add fused bias epilogue
 - [ ] Add ReLU and GELU epilogues
 - [ ] Add row-wise softmax reference

@@ -3,6 +3,7 @@ import unittest
 
 from benchmark import tile_sizes
 from kernels import (
+    batched_matmul,
     matmul,
     matmul_transposed_right,
     max_abs_difference,
@@ -12,6 +13,17 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_batched_matmul_matches_individual_products(self):
+        left = [[[1.0, 2.0], [3.0, 4.0]], [[-1.0, 0.0], [2.0, 1.0]]]
+        right = [[[2.0], [1.0]], [[3.0], [-2.0]]]
+        self.assertEqual(batched_matmul(left, right), [[[4.0], [10.0]], [[-3.0], [4.0]]])
+
+    def test_batched_matmul_rejects_bad_batch_dimensions(self):
+        with self.assertRaises(ValueError):
+            batched_matmul([], [])
+        with self.assertRaises(ValueError):
+            batched_matmul([[[1.0]]], [])
+
     def test_tile_sizes_parses_and_rejects_invalid_values(self):
         self.assertEqual(tile_sizes("1,4,16"), [1, 4, 16])
         with self.assertRaises(argparse.ArgumentTypeError):

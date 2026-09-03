@@ -4,8 +4,9 @@ An experimental CPU reference lab for tensor-kernel correctness and benchmarking
 
 The pure-Python implementation is deliberately a correctness oracle. It includes
 naive and tiled kernels for conventional `[k][n]` right-hand-side storage plus
-pre-transposed `[n][k]` storage. Native, NumPy, and Triton backends are roadmap
-items rather than implied current capabilities.
+pre-transposed `[n][k]` storage, and `batched_matmul` for matching batches of
+matrices. Native, NumPy, and Triton backends are roadmap items rather than
+implied current capabilities.
 
 ## Run
 

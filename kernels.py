@@ -28,6 +28,17 @@ def matmul(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) ->
     return output
 
 
+def batched_matmul(
+    left: Sequence[Sequence[Sequence[float]]], right: Sequence[Sequence[Sequence[float]]]
+) -> List[Matrix]:
+    """Multiply matching batches of matrices."""
+    if not left or not right:
+        raise ValueError("batches must not be empty")
+    if len(left) != len(right):
+        raise ValueError("batch dimensions must match")
+    return [matmul(left_matrix, right_matrix) for left_matrix, right_matrix in zip(left, right)]
+
+
 def matmul_transposed_right(
     left: Sequence[Sequence[float]], right_transposed: Sequence[Sequence[float]]
 ) -> Matrix:
