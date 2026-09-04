@@ -6,7 +6,7 @@
 - [x] Add transposed-right-hand-side layout
 - [x] Benchmark tile-size sensitivity
 - [x] Add batched matrix multiplication
-- [ ] Add fused bias epilogue
+- [x] Add fused bias epilogue
 - [ ] Add ReLU and GELU epilogues
 - [ ] Add row-wise softmax reference
 - [ ] Add numerically stable online softmax

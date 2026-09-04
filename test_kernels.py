@@ -5,6 +5,7 @@ from benchmark import tile_sizes
 from kernels import (
     batched_matmul,
     matmul,
+    matmul_bias,
     matmul_transposed_right,
     max_abs_difference,
     tiled_matmul,
@@ -13,6 +14,14 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_matmul_bias_fuses_column_bias_and_validates_shape(self):
+        self.assertEqual(
+            matmul_bias([[1.0, 2.0], [3.0, 4.0]], [[2.0, 1.0], [0.0, -1.0]], [0.5, -2.0]),
+            [[2.5, -3.0], [6.5, -3.0]],
+        )
+        with self.assertRaises(ValueError):
+            matmul_bias([[1.0]], [[2.0, 3.0]], [1.0])
+
     def test_batched_matmul_matches_individual_products(self):
         left = [[[1.0, 2.0], [3.0, 4.0]], [[-1.0, 0.0], [2.0, 1.0]]]
         right = [[[2.0], [1.0]], [[3.0], [-2.0]]]

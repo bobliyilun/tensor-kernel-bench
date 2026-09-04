@@ -28,6 +28,25 @@ def matmul(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) ->
     return output
 
 
+def matmul_bias(
+    left: Sequence[Sequence[float]], right: Sequence[Sequence[float]], bias: Sequence[float]
+) -> Matrix:
+    """Multiply matrices and add a column-wise bias in the output loop."""
+    m, k = _shape(left)
+    right_k, n = _shape(right)
+    if k != right_k:
+        raise ValueError("inner dimensions must match")
+    if len(bias) != n:
+        raise ValueError("bias dimension must match output columns")
+    output = [list(bias) for _ in range(m)]
+    for i in range(m):
+        for p in range(k):
+            value = left[i][p]
+            for j in range(n):
+                output[i][j] += value * right[p][j]
+    return output
+
+
 def batched_matmul(
     left: Sequence[Sequence[Sequence[float]]], right: Sequence[Sequence[Sequence[float]]]
 ) -> List[Matrix]:
