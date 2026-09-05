@@ -6,6 +6,8 @@ from kernels import (
     batched_matmul,
     matmul,
     matmul_bias,
+    matmul_gelu,
+    matmul_relu,
     matmul_transposed_right,
     max_abs_difference,
     tiled_matmul,
@@ -14,6 +16,17 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_matmul_relu_applies_activation_after_accumulation(self):
+        self.assertEqual(
+            matmul_relu([[1.0, 2.0], [-1.0, 1.0]], [[2.0, -1.0], [-1.0, 0.0]]),
+            [[0.0, 0.0], [0.0, 1.0]],
+        )
+
+    def test_matmul_gelu_matches_exact_definition(self):
+        actual = matmul_gelu([[1.0, -1.0]], [[1.0, 0.0], [0.0, 1.0]])
+        self.assertAlmostEqual(actual[0][0], 0.8413447460685429)
+        self.assertAlmostEqual(actual[0][1], -0.15865525393145707)
+
     def test_matmul_bias_fuses_column_bias_and_validates_shape(self):
         self.assertEqual(
             matmul_bias([[1.0, 2.0], [3.0, 4.0]], [[2.0, 1.0], [0.0, -1.0]], [0.5, -2.0]),

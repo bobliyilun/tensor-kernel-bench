@@ -6,8 +6,9 @@ The pure-Python implementation is deliberately a correctness oracle. It includes
 naive and tiled kernels for conventional `[k][n]` right-hand-side storage plus
 pre-transposed `[n][k]` storage, and `batched_matmul` for matching batches of
 matrices. `matmul_bias(left, right, bias)` adds a length-`n` column bias while
-accumulating the product. Native, NumPy, and Triton backends are roadmap items
-rather than implied current capabilities.
+accumulating the product. `matmul_relu(left, right)` and `matmul_gelu(left,
+right)` apply ReLU and exact GELU output epilogues respectively. Native, NumPy,
+and Triton backends are roadmap items rather than implied current capabilities.
 
 ## Run
 

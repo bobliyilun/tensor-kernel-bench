@@ -7,7 +7,7 @@
 - [x] Benchmark tile-size sensitivity
 - [x] Add batched matrix multiplication
 - [x] Add fused bias epilogue
-- [ ] Add ReLU and GELU epilogues
+- [x] Add ReLU and GELU epilogues
 - [ ] Add row-wise softmax reference
 - [ ] Add numerically stable online softmax
 - [ ] Add layer-normalization reference

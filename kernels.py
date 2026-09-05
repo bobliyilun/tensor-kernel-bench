@@ -1,5 +1,6 @@
 """Correctness-first tensor kernel references."""
 
+import math
 from typing import List, Sequence, Tuple
 
 Matrix = List[List[float]]
@@ -44,6 +45,41 @@ def matmul_bias(
             value = left[i][p]
             for j in range(n):
                 output[i][j] += value * right[p][j]
+    return output
+
+
+def matmul_relu(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> Matrix:
+    """Multiply matrices and apply a ReLU epilogue in the output loop."""
+    m, k = _shape(left)
+    right_k, n = _shape(right)
+    if k != right_k:
+        raise ValueError("inner dimensions must match")
+    output = [[0.0] * n for _ in range(m)]
+    for i in range(m):
+        for p in range(k):
+            value = left[i][p]
+            for j in range(n):
+                output[i][j] += value * right[p][j]
+        for j in range(n):
+            output[i][j] = max(0.0, output[i][j])
+    return output
+
+
+def matmul_gelu(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> Matrix:
+    """Multiply matrices and apply the exact GELU epilogue in the output loop."""
+    m, k = _shape(left)
+    right_k, n = _shape(right)
+    if k != right_k:
+        raise ValueError("inner dimensions must match")
+    output = [[0.0] * n for _ in range(m)]
+    for i in range(m):
+        for p in range(k):
+            value = left[i][p]
+            for j in range(n):
+                output[i][j] += value * right[p][j]
+        for j in range(n):
+            value = output[i][j]
+            output[i][j] = 0.5 * value * (1.0 + math.erf(value / math.sqrt(2.0)))
     return output
 
 
