@@ -83,6 +83,17 @@ def matmul_gelu(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]
     return output
 
 
+def row_softmax(values: Sequence[Sequence[float]]) -> Matrix:
+    """Apply the softmax function independently to every row."""
+    _shape(values)
+    output = []
+    for row in values:
+        exponentials = [math.exp(value) for value in row]
+        total = sum(exponentials)
+        output.append([value / total for value in exponentials])
+    return output
+
+
 def batched_matmul(
     left: Sequence[Sequence[Sequence[float]]], right: Sequence[Sequence[Sequence[float]]]
 ) -> List[Matrix]:

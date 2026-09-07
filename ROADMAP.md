@@ -8,7 +8,7 @@
 - [x] Add batched matrix multiplication
 - [x] Add fused bias epilogue
 - [x] Add ReLU and GELU epilogues
-- [ ] Add row-wise softmax reference
+- [x] Add row-wise softmax reference
 - [ ] Add numerically stable online softmax
 - [ ] Add layer-normalization reference
 - [ ] Add causal attention reference

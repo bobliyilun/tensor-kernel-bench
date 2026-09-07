@@ -1,4 +1,5 @@
 import argparse
+import math
 import unittest
 
 from benchmark import tile_sizes
@@ -10,12 +11,21 @@ from kernels import (
     matmul_relu,
     matmul_transposed_right,
     max_abs_difference,
+    row_softmax,
     tiled_matmul,
     tiled_matmul_transposed_right,
 )
 
 
 class KernelTests(unittest.TestCase):
+    def test_row_softmax_normalizes_each_row(self):
+        actual = row_softmax([[0.0, 0.0], [0.0, math.log(3.0)]])
+        self.assertEqual(actual[0], [0.5, 0.5])
+        self.assertAlmostEqual(actual[1][0], 0.25)
+        self.assertAlmostEqual(actual[1][1], 0.75)
+        with self.assertRaises(ValueError):
+            row_softmax([])
+
     def test_matmul_relu_applies_activation_after_accumulation(self):
         self.assertEqual(
             matmul_relu([[1.0, 2.0], [-1.0, 1.0]], [[2.0, -1.0], [-1.0, 0.0]]),
