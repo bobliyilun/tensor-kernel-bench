@@ -8,7 +8,8 @@ pre-transposed `[n][k]` storage, and `batched_matmul` for matching batches of
 matrices. `matmul_bias(left, right, bias)` adds a length-`n` column bias while
 accumulating the product. `matmul_relu(left, right)` and `matmul_gelu(left,
 right)` apply ReLU and exact GELU output epilogues respectively. `row_softmax(values)`
-independently normalizes each matrix row. Native, NumPy,
+independently normalizes each matrix row. `row_softmax_online(values)` uses an
+online maximum and sum to avoid overflow on large finite logits. Native, NumPy,
 and Triton backends are roadmap items rather than implied current capabilities.
 
 ## Run

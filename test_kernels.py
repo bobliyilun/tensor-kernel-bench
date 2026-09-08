@@ -12,6 +12,7 @@ from kernels import (
     matmul_transposed_right,
     max_abs_difference,
     row_softmax,
+    row_softmax_online,
     tiled_matmul,
     tiled_matmul_transposed_right,
 )
@@ -25,6 +26,12 @@ class KernelTests(unittest.TestCase):
         self.assertAlmostEqual(actual[1][1], 0.75)
         with self.assertRaises(ValueError):
             row_softmax([])
+
+    def test_online_row_softmax_handles_large_values(self):
+        actual = row_softmax_online([[1000.0, 1001.0], [-1000.0, -1000.0]])
+        self.assertAlmostEqual(actual[0][0], 1.0 / (1.0 + math.e))
+        self.assertAlmostEqual(actual[0][1], math.e / (1.0 + math.e))
+        self.assertEqual(actual[1], [0.5, 0.5])
 
     def test_matmul_relu_applies_activation_after_accumulation(self):
         self.assertEqual(

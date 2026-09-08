@@ -94,6 +94,23 @@ def row_softmax(values: Sequence[Sequence[float]]) -> Matrix:
     return output
 
 
+def row_softmax_online(values: Sequence[Sequence[float]]) -> Matrix:
+    """Apply numerically stable softmax to each row using an online maximum."""
+    _shape(values)
+    output = []
+    for row in values:
+        maximum = -math.inf
+        total = 0.0
+        for value in row:
+            if value <= maximum:
+                total += math.exp(value - maximum)
+            else:
+                total = total * math.exp(maximum - value) + 1.0
+                maximum = value
+        output.append([math.exp(value - maximum) / total for value in row])
+    return output
+
+
 def batched_matmul(
     left: Sequence[Sequence[Sequence[float]]], right: Sequence[Sequence[Sequence[float]]]
 ) -> List[Matrix]:

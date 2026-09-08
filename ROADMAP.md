@@ -9,7 +9,7 @@
 - [x] Add fused bias epilogue
 - [x] Add ReLU and GELU epilogues
 - [x] Add row-wise softmax reference
-- [ ] Add numerically stable online softmax
+- [x] Add numerically stable online softmax
 - [ ] Add layer-normalization reference
 - [ ] Add causal attention reference
 - [ ] Add operation and memory-traffic estimates
