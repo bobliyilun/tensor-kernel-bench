@@ -10,7 +10,7 @@
 - [x] Add ReLU and GELU epilogues
 - [x] Add row-wise softmax reference
 - [x] Add numerically stable online softmax
-- [ ] Add layer-normalization reference
+- [x] Add layer-normalization reference
 - [ ] Add causal attention reference
 - [ ] Add operation and memory-traffic estimates
 - [ ] Add CSV benchmark export

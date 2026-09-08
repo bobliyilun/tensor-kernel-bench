@@ -11,6 +11,7 @@ from kernels import (
     matmul_relu,
     matmul_transposed_right,
     max_abs_difference,
+    row_layer_norm,
     row_softmax,
     row_softmax_online,
     tiled_matmul,
@@ -19,6 +20,14 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_row_layer_norm_normalizes_each_row_and_validates_epsilon(self):
+        actual = row_layer_norm([[1.0, 3.0], [5.0, 5.0]], epsilon=1e-8)
+        self.assertAlmostEqual(actual[0][0], -1.0, places=7)
+        self.assertAlmostEqual(actual[0][1], 1.0, places=7)
+        self.assertEqual(actual[1], [0.0, 0.0])
+        with self.assertRaises(ValueError):
+            row_layer_norm([[1.0]], epsilon=0.0)
+
     def test_row_softmax_normalizes_each_row(self):
         actual = row_softmax([[0.0, 0.0], [0.0, math.log(3.0)]])
         self.assertEqual(actual[0], [0.5, 0.5])

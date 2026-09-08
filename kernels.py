@@ -111,6 +111,20 @@ def row_softmax_online(values: Sequence[Sequence[float]]) -> Matrix:
     return output
 
 
+def row_layer_norm(values: Sequence[Sequence[float]], epsilon: float = 1e-5) -> Matrix:
+    """Normalize each row to zero mean and unit variance."""
+    _shape(values)
+    if epsilon <= 0:
+        raise ValueError("epsilon must be positive")
+    output = []
+    for row in values:
+        mean = sum(row) / len(row)
+        variance = sum((value - mean) ** 2 for value in row) / len(row)
+        scale = math.sqrt(variance + epsilon)
+        output.append([(value - mean) / scale for value in row])
+    return output
+
+
 def batched_matmul(
     left: Sequence[Sequence[Sequence[float]]], right: Sequence[Sequence[Sequence[float]]]
 ) -> List[Matrix]:
