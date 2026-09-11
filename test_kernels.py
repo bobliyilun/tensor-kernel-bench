@@ -5,6 +5,7 @@ import unittest
 from benchmark import tile_sizes
 from kernels import (
     batched_matmul,
+    causal_attention,
     matmul,
     matmul_bias,
     matmul_gelu,
@@ -20,6 +21,20 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_causal_attention_masks_future_tokens_and_scales_scores(self):
+        actual = causal_attention(
+            [[1.0, 0.0], [0.0, 1.0]],
+            [[1.0, 0.0], [0.0, 1.0]],
+            [[10.0], [20.0]],
+        )
+        weight = math.exp(1.0 / math.sqrt(2.0))
+        self.assertEqual(actual[0], [10.0])
+        self.assertAlmostEqual(actual[1][0], (10.0 + 20.0 * weight) / (1.0 + weight))
+        with self.assertRaises(ValueError):
+            causal_attention([[1.0]], [[1.0], [2.0]], [[1.0]])
+        with self.assertRaises(ValueError):
+            causal_attention([[1.0]], [[1.0, 2.0]], [[1.0]])
+
     def test_row_layer_norm_normalizes_each_row_and_validates_epsilon(self):
         actual = row_layer_norm([[1.0, 3.0], [5.0, 5.0]], epsilon=1e-8)
         self.assertAlmostEqual(actual[0][0], -1.0, places=7)

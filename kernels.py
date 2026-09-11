@@ -125,6 +125,40 @@ def row_layer_norm(values: Sequence[Sequence[float]], epsilon: float = 1e-5) -> 
     return output
 
 
+def causal_attention(
+    query: Sequence[Sequence[float]],
+    key: Sequence[Sequence[float]],
+    value: Sequence[Sequence[float]],
+) -> Matrix:
+    """Apply scaled dot-product attention, masking positions after each query."""
+    sequence_length, head_size = _shape(query)
+    key_length, key_size = _shape(key)
+    value_length, value_size = _shape(value)
+    if key_length != sequence_length or value_length != sequence_length:
+        raise ValueError("query, key, and value sequence lengths must match")
+    if key_size != head_size:
+        raise ValueError("query and key head dimensions must match")
+
+    scale = 1.0 / math.sqrt(head_size)
+    output = []
+    for position, query_row in enumerate(query):
+        scores = [
+            sum(q * k for q, k in zip(query_row, key[index])) * scale
+            for index in range(position + 1)
+        ]
+        maximum = max(scores)
+        weights = [math.exp(score - maximum) for score in scores]
+        total = sum(weights)
+        output.append(
+            [
+                sum(weights[index] * value[index][column] for index in range(position + 1))
+                / total
+                for column in range(value_size)
+            ]
+        )
+    return output
+
+
 def batched_matmul(
     left: Sequence[Sequence[Sequence[float]]], right: Sequence[Sequence[Sequence[float]]]
 ) -> List[Matrix]:

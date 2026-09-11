@@ -10,8 +10,9 @@ accumulating the product. `matmul_relu(left, right)` and `matmul_gelu(left,
 right)` apply ReLU and exact GELU output epilogues respectively. `row_softmax(values)`
 independently normalizes each matrix row. `row_softmax_online(values)` uses an
 online maximum and sum to avoid overflow on large finite logits. `row_layer_norm(values,
-epsilon)` normalizes each row using its population variance. Native, NumPy,
-and Triton backends are roadmap items rather than implied current capabilities.
+epsilon)` normalizes each row using its population variance. `causal_attention(query, key,
+value)` applies stable scaled dot-product attention with a causal mask. Native, NumPy, and
+Triton backends are roadmap items rather than implied current capabilities.
 
 ## Run
 

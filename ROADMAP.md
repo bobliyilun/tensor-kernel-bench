@@ -11,7 +11,7 @@
 - [x] Add row-wise softmax reference
 - [x] Add numerically stable online softmax
 - [x] Add layer-normalization reference
-- [ ] Add causal attention reference
+- [x] Add causal attention reference
 - [ ] Add operation and memory-traffic estimates
 - [ ] Add CSV benchmark export
 - [ ] Add machine-readable benchmark regression thresholds
