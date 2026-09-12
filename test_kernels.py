@@ -2,7 +2,7 @@ import argparse
 import math
 import unittest
 
-from benchmark import tile_sizes
+from benchmark import matmul_estimates, tile_sizes
 from kernels import (
     batched_matmul,
     causal_attention,
@@ -93,6 +93,22 @@ class KernelTests(unittest.TestCase):
             tile_sizes("0,4")
         with self.assertRaises(argparse.ArgumentTypeError):
             tile_sizes("four")
+
+    def test_matmul_estimates_report_logical_work_and_reference_accesses(self):
+        self.assertEqual(
+            matmul_estimates(2, 3, 4),
+            {
+                "additions": 16,
+                "multiplications": 24,
+                "logical_flops": 48,
+                "memory_element_accesses": {
+                    "left_reads": 24,
+                    "right_reads": 24,
+                    "output_writes": 8,
+                    "total": 56,
+                },
+            },
+        )
 
     def test_tiled_matches_reference_for_rectangular_input(self):
         left = [[1.0, 2.0, 3.0], [-1.0, 0.0, 4.0]]

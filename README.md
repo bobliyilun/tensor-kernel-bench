@@ -25,5 +25,8 @@ python3 -m unittest -v
 Use `--tiles` to measure tile-size sensitivity. Each result includes its
 correctness difference from the naive reference and basic runtime context;
 compare only runs with the same shape, repeat count, and environment.
+It also includes exact logical arithmetic counts and element-access estimates
+for the reference matmul loop. These model reads from the two inputs and one
+write per output element; they are not measurements of cache or DRAM traffic.
 
 See [ROADMAP.md](ROADMAP.md) for kernel and backend milestones.

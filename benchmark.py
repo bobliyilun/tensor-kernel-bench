@@ -34,6 +34,27 @@ def tile_sizes(value: str) -> list[int]:
     return sizes
 
 
+def matmul_estimates(m: int, k: int, n: int) -> dict:
+    """Return logical arithmetic and element-access estimates for ``m x k`` by ``k x n``.
+
+    Memory values model the reference loop: each multiply reads one left and one
+    right element, and each output element is written once.  They are element
+    counts, not measured hardware traffic or byte counts.
+    """
+    products = m * k * n
+    return {
+        "additions": m * n * (k - 1),
+        "multiplications": products,
+        "logical_flops": products * 2,
+        "memory_element_accesses": {
+            "left_reads": products,
+            "right_reads": products,
+            "output_writes": m * n,
+            "total": products * 2 + m * n,
+        },
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--m", type=int, default=24)
@@ -63,6 +84,7 @@ def main() -> None:
             "python": platform.python_version(),
         },
         "shape": [args.m, args.k, args.n],
+        "estimates": matmul_estimates(args.m, args.k, args.n),
         "tile": args.tile,
         "tile_sensitivity": [
             {
