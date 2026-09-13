@@ -1,8 +1,10 @@
 import argparse
+import csv
 import math
+import tempfile
 import unittest
 
-from benchmark import matmul_estimates, tile_sizes
+from benchmark import matmul_estimates, tile_sizes, write_csv
 from kernels import (
     batched_matmul,
     causal_attention,
@@ -109,6 +111,29 @@ class KernelTests(unittest.TestCase):
                 },
             },
         )
+
+    def test_csv_export_writes_one_row_per_tile(self):
+        report = {
+            "environment": {
+                "cpu_count": 4,
+                "machine": "test-machine",
+                "platform": "test-platform",
+                "python": "3.test",
+            },
+            "shape": [2, 3, 4],
+            "repeats": 5,
+            "tile_sensitivity": [
+                {"tile": 1, "median_ms": 0.1, "max_abs_difference": 0.0},
+                {"tile": 2, "median_ms": 0.2, "max_abs_difference": 1e-12},
+            ],
+        }
+        with tempfile.NamedTemporaryFile(mode="w+", newline="", encoding="utf-8") as output:
+            write_csv(output.name, report)
+            rows = list(csv.DictReader(output))
+        self.assertEqual(rows[0]["m"], "2")
+        self.assertEqual(rows[0]["tile"], "1")
+        self.assertEqual(rows[1]["tile"], "2")
+        self.assertEqual(rows[1]["max_abs_difference"], "1e-12")
 
     def test_tiled_matches_reference_for_rectangular_input(self):
         left = [[1.0, 2.0, 3.0], [-1.0, 0.0, 4.0]]

@@ -1,6 +1,7 @@
 """Benchmark the matrix-multiplication reference kernels."""
 
 import argparse
+import csv
 import json
 import os
 import platform
@@ -55,6 +56,41 @@ def matmul_estimates(m: int, k: int, n: int) -> dict:
     }
 
 
+def write_csv(path: str, report: dict) -> None:
+    """Write one flat CSV row for every measured tile size."""
+    fields = [
+        "m",
+        "k",
+        "n",
+        "tile",
+        "repeats",
+        "median_ms",
+        "max_abs_difference",
+        "python",
+        "platform",
+        "machine",
+        "cpu_count",
+    ]
+    environment = report["environment"]
+    m, k, n = report["shape"]
+    with open(path, "w", newline="", encoding="utf-8") as output:
+        writer = csv.DictWriter(output, fieldnames=fields)
+        writer.writeheader()
+        for measurement in report["tile_sensitivity"]:
+            writer.writerow(
+                {
+                    "m": m,
+                    "k": k,
+                    "n": n,
+                    "tile": measurement["tile"],
+                    "repeats": report["repeats"],
+                    "median_ms": measurement["median_ms"],
+                    "max_abs_difference": measurement["max_abs_difference"],
+                    **environment,
+                }
+            )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--m", type=int, default=24)
@@ -66,6 +102,7 @@ def main() -> None:
     )
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--csv", help="write tile measurements to this CSV file")
     args = parser.parse_args()
     if min(args.m, args.k, args.n, args.tile, args.repeats) <= 0:
         parser.error("dimensions, tile, and repeats must be positive")
@@ -100,6 +137,8 @@ def main() -> None:
         "tiled_median_ms": median_ms(lambda: tiled_matmul(left, right, args.tile), args.repeats),
     }
     print(json.dumps(report, indent=2, sort_keys=True))
+    if args.csv:
+        write_csv(args.csv, report)
 
 
 if __name__ == "__main__":
