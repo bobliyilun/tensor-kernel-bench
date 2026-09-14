@@ -20,6 +20,7 @@ Triton backends are roadmap items rather than implied current capabilities.
 python3 benchmark.py --m 24 --k 32 --n 16 --tile 8 --repeats 3
 python3 benchmark.py --m 256 --k 256 --n 256 --tiles 1,2,4,8,16,32 --repeats 5
 python3 benchmark.py --m 256 --k 256 --n 256 --tiles 8,16,32 --repeats 5 --csv results.csv
+python3 benchmark.py --m 24 --k 32 --n 16 --tiles 4,8 --repeats 3 --thresholds thresholds.json
 python3 -m unittest -v
 ```
 
@@ -31,5 +32,10 @@ for the reference matmul loop. These model reads from the two inputs and one
 write per output element; they are not measurements of cache or DRAM traffic.
 Pass `--csv PATH` to write one flat row per measured tile, including the
 shape, repeat count, timing, correctness difference, and runtime context.
+Pass `--thresholds PATH` to enforce JSON ceilings such as
+`{"max_median_ms": 10.0, "max_abs_difference": 1e-12}` for every requested
+tile. The JSON report records the threshold verdict and exits nonzero when a
+ceiling is exceeded; choose timing ceilings only for a stable, comparable
+environment.
 
 See [ROADMAP.md](ROADMAP.md) for kernel and backend milestones.

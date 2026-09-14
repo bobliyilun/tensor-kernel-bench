@@ -14,7 +14,7 @@
 - [x] Add causal attention reference
 - [x] Add operation and memory-traffic estimates
 - [x] Add CSV benchmark export
-- [ ] Add machine-readable benchmark regression thresholds
+- [x] Add machine-readable benchmark regression thresholds
 - [ ] Add optional NumPy backend
 - [ ] Add optional PyTorch eager backend
 - [ ] Add optional torch.compile comparison

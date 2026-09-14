@@ -4,7 +4,7 @@ import math
 import tempfile
 import unittest
 
-from benchmark import matmul_estimates, tile_sizes, write_csv
+from benchmark import load_thresholds, matmul_estimates, threshold_violations, tile_sizes, write_csv
 from kernels import (
     batched_matmul,
     causal_attention,
@@ -134,6 +134,16 @@ class KernelTests(unittest.TestCase):
         self.assertEqual(rows[0]["tile"], "1")
         self.assertEqual(rows[1]["tile"], "2")
         self.assertEqual(rows[1]["max_abs_difference"], "1e-12")
+
+    def test_regression_thresholds_validate_and_report_exceeded_tiles(self):
+        with tempfile.NamedTemporaryFile(mode="w+", encoding="utf-8") as output:
+            output.write('{"max_median_ms": 1.0, "max_abs_difference": 0.0}')
+            output.flush()
+            thresholds = load_thresholds(output.name)
+        report = {"tile_sensitivity": [{"tile": 4, "median_ms": 1.1, "max_abs_difference": 0.0}]}
+        self.assertEqual(threshold_violations(report, thresholds), ["tile 4 max_median_ms"])
+        with self.assertRaises(OSError):
+            load_thresholds("does-not-exist.json")
 
     def test_tiled_matches_reference_for_rectangular_input(self):
         left = [[1.0, 2.0, 3.0], [-1.0, 0.0, 4.0]]

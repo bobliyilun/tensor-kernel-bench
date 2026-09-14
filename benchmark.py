@@ -91,6 +91,29 @@ def write_csv(path: str, report: dict) -> None:
             )
 
 
+def load_thresholds(path: str) -> dict:
+    """Read numeric benchmark ceilings from a JSON file."""
+    with open(path, encoding="utf-8") as source:
+        thresholds = json.load(source)
+    allowed = {"max_median_ms", "max_abs_difference"}
+    if not isinstance(thresholds, dict) or not thresholds or set(thresholds) - allowed:
+        raise ValueError("thresholds must contain max_median_ms and/or max_abs_difference")
+    if any(not isinstance(value, (int, float)) or value < 0 for value in thresholds.values()):
+        raise ValueError("thresholds must be non-negative numbers")
+    return thresholds
+
+
+def threshold_violations(report: dict, thresholds: dict) -> list[str]:
+    """Return measured tile values that exceed configured ceilings."""
+    violations = []
+    for measurement in report["tile_sensitivity"]:
+        for key in thresholds:
+            metric = "median_ms" if key == "max_median_ms" else key
+            if measurement[metric] > thresholds[key]:
+                violations.append(f"tile {measurement['tile']} {key}")
+    return violations
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--m", type=int, default=24)
@@ -103,6 +126,7 @@ def main() -> None:
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--csv", help="write tile measurements to this CSV file")
+    parser.add_argument("--thresholds", help="JSON file with benchmark ceilings")
     args = parser.parse_args()
     if min(args.m, args.k, args.n, args.tile, args.repeats) <= 0:
         parser.error("dimensions, tile, and repeats must be positive")
@@ -136,9 +160,18 @@ def main() -> None:
         "naive_median_ms": median_ms(lambda: matmul(left, right), args.repeats),
         "tiled_median_ms": median_ms(lambda: tiled_matmul(left, right, args.tile), args.repeats),
     }
+    if args.thresholds:
+        try:
+            thresholds = load_thresholds(args.thresholds)
+        except (OSError, ValueError) as error:
+            parser.error(str(error))
+        violations = threshold_violations(report, thresholds)
+        report["thresholds"] = {"path": args.thresholds, **thresholds, "passed": not violations, "violations": violations}
     print(json.dumps(report, indent=2, sort_keys=True))
     if args.csv:
         write_csv(args.csv, report)
+    if args.thresholds and violations:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
