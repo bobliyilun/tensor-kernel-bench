@@ -9,7 +9,7 @@ import random
 import statistics
 import time
 
-from kernels import matmul, matmul_numpy, max_abs_difference, tiled_matmul
+from kernels import matmul, matmul_numpy, matmul_torch, max_abs_difference, tiled_matmul
 
 
 def random_matrix(rows: int, columns: int, rng: random.Random) -> list:
@@ -127,7 +127,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--csv", help="write tile measurements to this CSV file")
     parser.add_argument("--thresholds", help="JSON file with benchmark ceilings")
-    parser.add_argument("--backend", choices=("python", "numpy"), default="python")
+    parser.add_argument("--backend", choices=("python", "numpy", "torch"), default="python")
     args = parser.parse_args()
     if min(args.m, args.k, args.n, args.tile, args.repeats) <= 0:
         parser.error("dimensions, tile, and repeats must be positive")
@@ -137,7 +137,7 @@ def main() -> None:
     right = random_matrix(args.k, args.n, rng)
     reference = matmul(left, right)
     tiled = tiled_matmul(left, right, args.tile)
-    backend = matmul if args.backend == "python" else matmul_numpy
+    backend = {"python": matmul, "numpy": matmul_numpy, "torch": matmul_torch}[args.backend]
     backend_result = backend(left, right)
     tiles = args.tiles or [args.tile]
     report = {

@@ -14,6 +14,7 @@ from kernels import (
     matmul_gelu,
     matmul_numpy,
     matmul_relu,
+    matmul_torch,
     matmul_transposed_right,
     max_abs_difference,
     row_layer_norm,
@@ -25,6 +26,11 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_torch_backend_reports_missing_optional_dependency(self):
+        with patch.dict("sys.modules", {"torch": None}):
+            with self.assertRaisesRegex(RuntimeError, "requires torch"):
+                matmul_torch([[1.0]], [[2.0]])
+
     def test_numpy_backend_reports_missing_optional_dependency(self):
         with patch.dict("sys.modules", {"numpy": None}):
             with self.assertRaisesRegex(RuntimeError, "requires numpy"):

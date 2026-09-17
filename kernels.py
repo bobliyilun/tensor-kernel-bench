@@ -38,6 +38,15 @@ def matmul_numpy(left: Sequence[Sequence[float]], right: Sequence[Sequence[float
     return np.matmul(np.asarray(left), np.asarray(right)).tolist()
 
 
+def matmul_torch(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> Matrix:
+    """Multiply matrices through eager PyTorch when its optional dependency is installed."""
+    try:
+        import torch
+    except ImportError as error:
+        raise RuntimeError("PyTorch backend requires torch; install it with pip") from error
+    return torch.matmul(torch.tensor(left), torch.tensor(right)).tolist()
+
+
 def matmul_bias(
     left: Sequence[Sequence[float]], right: Sequence[Sequence[float]], bias: Sequence[float]
 ) -> Matrix:
