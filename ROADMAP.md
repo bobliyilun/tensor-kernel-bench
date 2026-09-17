@@ -15,7 +15,7 @@
 - [x] Add operation and memory-traffic estimates
 - [x] Add CSV benchmark export
 - [x] Add machine-readable benchmark regression thresholds
-- [ ] Add optional NumPy backend
+- [x] Add optional NumPy backend
 - [ ] Add optional PyTorch eager backend
 - [ ] Add optional torch.compile comparison
 - [ ] Add optional Triton matmul kernel

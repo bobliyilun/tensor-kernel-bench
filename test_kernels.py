@@ -3,6 +3,7 @@ import csv
 import math
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from benchmark import load_thresholds, matmul_estimates, threshold_violations, tile_sizes, write_csv
 from kernels import (
@@ -11,6 +12,7 @@ from kernels import (
     matmul,
     matmul_bias,
     matmul_gelu,
+    matmul_numpy,
     matmul_relu,
     matmul_transposed_right,
     max_abs_difference,
@@ -23,6 +25,11 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_numpy_backend_reports_missing_optional_dependency(self):
+        with patch.dict("sys.modules", {"numpy": None}):
+            with self.assertRaisesRegex(RuntimeError, "requires numpy"):
+                matmul_numpy([[1.0]], [[2.0]])
+
     def test_causal_attention_masks_future_tokens_and_scales_scores(self):
         actual = causal_attention(
             [[1.0, 0.0], [0.0, 1.0]],

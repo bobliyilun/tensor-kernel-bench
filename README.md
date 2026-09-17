@@ -11,8 +11,8 @@ right)` apply ReLU and exact GELU output epilogues respectively. `row_softmax(va
 independently normalizes each matrix row. `row_softmax_online(values)` uses an
 online maximum and sum to avoid overflow on large finite logits. `row_layer_norm(values,
 epsilon)` normalizes each row using its population variance. `causal_attention(query, key,
-value)` applies stable scaled dot-product attention with a causal mask. Native, NumPy, and
-Triton backends are roadmap items rather than implied current capabilities.
+value)` applies stable scaled dot-product attention with a causal mask. Native and Triton
+backends are roadmap items rather than implied current capabilities.
 
 ## Run
 
@@ -21,6 +21,7 @@ python3 benchmark.py --m 24 --k 32 --n 16 --tile 8 --repeats 3
 python3 benchmark.py --m 256 --k 256 --n 256 --tiles 1,2,4,8,16,32 --repeats 5
 python3 benchmark.py --m 256 --k 256 --n 256 --tiles 8,16,32 --repeats 5 --csv results.csv
 python3 benchmark.py --m 24 --k 32 --n 16 --tiles 4,8 --repeats 3 --thresholds thresholds.json
+python3 benchmark.py --m 24 --k 32 --n 16 --backend numpy
 python3 -m unittest -v
 ```
 
@@ -37,5 +38,9 @@ Pass `--thresholds PATH` to enforce JSON ceilings such as
 tile. The JSON report records the threshold verdict and exits nonzero when a
 ceiling is exceeded; choose timing ceilings only for a stable, comparable
 environment.
+
+The optional NumPy backend uses `numpy.matmul` and is selected with `--backend
+numpy`. Install NumPy separately (`python3 -m pip install numpy`); the default
+backend remains the pure-Python reference.
 
 See [ROADMAP.md](ROADMAP.md) for kernel and backend milestones.

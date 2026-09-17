@@ -29,6 +29,15 @@ def matmul(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) ->
     return output
 
 
+def matmul_numpy(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> Matrix:
+    """Multiply matrices through NumPy when its optional dependency is installed."""
+    try:
+        import numpy as np
+    except ImportError as error:
+        raise RuntimeError("NumPy backend requires numpy; install it with pip") from error
+    return np.matmul(np.asarray(left), np.asarray(right)).tolist()
+
+
 def matmul_bias(
     left: Sequence[Sequence[float]], right: Sequence[Sequence[float]], bias: Sequence[float]
 ) -> Matrix:
