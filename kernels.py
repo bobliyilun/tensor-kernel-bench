@@ -4,6 +4,7 @@ import math
 from typing import List, Sequence, Tuple
 
 Matrix = List[List[float]]
+_compiled_torch_matmul = None
 
 
 def _shape(matrix: Sequence[Sequence[float]]) -> Tuple[int, int]:
@@ -45,6 +46,20 @@ def matmul_torch(left: Sequence[Sequence[float]], right: Sequence[Sequence[float
     except ImportError as error:
         raise RuntimeError("PyTorch backend requires torch; install it with pip") from error
     return torch.matmul(torch.tensor(left), torch.tensor(right)).tolist()
+
+
+def matmul_torch_compile(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> Matrix:
+    """Multiply matrices through cached ``torch.compile(torch.matmul)`` on CPU."""
+    global _compiled_torch_matmul
+    try:
+        import torch
+    except ImportError as error:
+        raise RuntimeError("torch.compile backend requires torch; install it with pip") from error
+    if not hasattr(torch, "compile"):
+        raise RuntimeError("torch.compile backend requires PyTorch 2.0 or newer")
+    if _compiled_torch_matmul is None:
+        _compiled_torch_matmul = torch.compile(torch.matmul)
+    return _compiled_torch_matmul(torch.tensor(left), torch.tensor(right)).tolist()
 
 
 def matmul_bias(

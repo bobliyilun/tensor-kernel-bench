@@ -2,9 +2,11 @@ import argparse
 import csv
 import math
 import tempfile
+import types
 import unittest
 from unittest.mock import patch
 
+import kernels
 from benchmark import load_thresholds, matmul_estimates, threshold_violations, tile_sizes, write_csv
 from kernels import (
     batched_matmul,
@@ -15,6 +17,7 @@ from kernels import (
     matmul_numpy,
     matmul_relu,
     matmul_torch,
+    matmul_torch_compile,
     matmul_transposed_right,
     max_abs_difference,
     row_layer_norm,
@@ -26,6 +29,30 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_torch_compile_backend_requires_supported_torch(self):
+        with patch.dict("sys.modules", {"torch": types.SimpleNamespace()}), patch.object(
+            kernels, "_compiled_torch_matmul", None
+        ):
+            with self.assertRaisesRegex(RuntimeError, "PyTorch 2.0"):
+                matmul_torch_compile([[1.0]], [[2.0]])
+
+    def test_torch_compile_backend_compiles_once(self):
+        compiled = []
+
+        def compile_matmul(function):
+            compiled.append(function)
+            return lambda left, right: types.SimpleNamespace(tolist=lambda: [[left[0][0] * right[0][0]]])
+
+        torch = types.SimpleNamespace(
+            compile=compile_matmul, matmul=object(), tensor=lambda values: values
+        )
+        with patch.dict("sys.modules", {"torch": torch}), patch.object(
+            kernels, "_compiled_torch_matmul", None
+        ):
+            self.assertEqual(matmul_torch_compile([[3.0]], [[2.0]]), [[6.0]])
+            self.assertEqual(matmul_torch_compile([[4.0]], [[2.0]]), [[8.0]])
+        self.assertEqual(compiled, [torch.matmul])
+
     def test_torch_backend_reports_missing_optional_dependency(self):
         with patch.dict("sys.modules", {"torch": None}):
             with self.assertRaisesRegex(RuntimeError, "requires torch"):

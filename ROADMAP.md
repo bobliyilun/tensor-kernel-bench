@@ -17,6 +17,6 @@
 - [x] Add machine-readable benchmark regression thresholds
 - [x] Add optional NumPy backend
 - [x] Add optional PyTorch eager backend
-- [ ] Add optional torch.compile comparison
+- [x] Add optional torch.compile comparison
 - [ ] Add optional Triton matmul kernel
 - [ ] Publish backend comparison with hardware metadata

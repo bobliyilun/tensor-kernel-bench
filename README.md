@@ -23,6 +23,7 @@ python3 benchmark.py --m 256 --k 256 --n 256 --tiles 8,16,32 --repeats 5 --csv r
 python3 benchmark.py --m 24 --k 32 --n 16 --tiles 4,8 --repeats 3 --thresholds thresholds.json
 python3 benchmark.py --m 24 --k 32 --n 16 --backend numpy
 python3 benchmark.py --m 24 --k 32 --n 16 --backend torch
+python3 benchmark.py --m 24 --k 32 --n 16 --backend torch-compile
 python3 -m unittest -v
 ```
 
@@ -47,5 +48,11 @@ backend remains the pure-Python reference.
 The optional PyTorch eager backend uses `torch.matmul` and is selected with
 `--backend torch`. Install PyTorch separately (`python3 -m pip install torch`);
 it also defaults to CPU tensors and leaves the pure-Python backend unchanged.
+
+The optional `torch.compile` comparison uses a cached compiled `torch.matmul`
+and is selected with `--backend torch-compile`. It requires PyTorch 2.0 or
+newer. The first correctness run triggers compilation before timed repeats, so
+the reported backend timing excludes first-use compilation but includes CPU
+tensor conversion.
 
 See [ROADMAP.md](ROADMAP.md) for kernel and backend milestones.
