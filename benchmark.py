@@ -14,6 +14,7 @@ from kernels import (
     matmul_numpy,
     matmul_torch,
     matmul_torch_compile,
+    matmul_triton,
     max_abs_difference,
     tiled_matmul,
 )
@@ -135,7 +136,7 @@ def main() -> None:
     parser.add_argument("--csv", help="write tile measurements to this CSV file")
     parser.add_argument("--thresholds", help="JSON file with benchmark ceilings")
     parser.add_argument(
-        "--backend", choices=("python", "numpy", "torch", "torch-compile"), default="python"
+        "--backend", choices=("python", "numpy", "torch", "torch-compile", "triton"), default="python"
     )
     args = parser.parse_args()
     if min(args.m, args.k, args.n, args.tile, args.repeats) <= 0:
@@ -151,6 +152,7 @@ def main() -> None:
         "numpy": matmul_numpy,
         "torch": matmul_torch,
         "torch-compile": matmul_torch_compile,
+        "triton": matmul_triton,
     }[args.backend]
     backend_result = backend(left, right)
     tiles = args.tiles or [args.tile]

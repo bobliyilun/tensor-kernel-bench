@@ -18,6 +18,7 @@ from kernels import (
     matmul_relu,
     matmul_torch,
     matmul_torch_compile,
+    matmul_triton,
     matmul_transposed_right,
     max_abs_difference,
     row_layer_norm,
@@ -29,6 +30,11 @@ from kernels import (
 
 
 class KernelTests(unittest.TestCase):
+    def test_triton_backend_reports_missing_optional_dependency(self):
+        with patch.dict("sys.modules", {"triton": None}):
+            with self.assertRaisesRegex(RuntimeError, "requires torch and triton"):
+                matmul_triton([[1.0]], [[2.0]])
+
     def test_torch_compile_backend_requires_supported_torch(self):
         with patch.dict("sys.modules", {"torch": types.SimpleNamespace()}), patch.object(
             kernels, "_compiled_torch_matmul", None

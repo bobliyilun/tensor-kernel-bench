@@ -62,6 +62,41 @@ def matmul_torch_compile(left: Sequence[Sequence[float]], right: Sequence[Sequen
     return _compiled_torch_matmul(torch.tensor(left), torch.tensor(right)).tolist()
 
 
+def matmul_triton(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> Matrix:
+    """Multiply float matrices with Triton on a CUDA-capable PyTorch installation."""
+    try:
+        import torch
+        import triton
+        import triton.language as tl
+    except ImportError as error:
+        raise RuntimeError("Triton backend requires torch and triton; install both with pip") from error
+    if not torch.cuda.is_available():
+        raise RuntimeError("Triton backend requires a CUDA-capable PyTorch installation")
+
+    m, k = _shape(left)
+    right_k, n = _shape(right)
+    if k != right_k:
+        raise ValueError("inner dimensions must match")
+
+    @triton.jit
+    def kernel(a, b, c, m: tl.constexpr, n: tl.constexpr, k: tl.constexpr, BLOCK: tl.constexpr):
+        row = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)
+        column = tl.program_id(1) * BLOCK + tl.arange(0, BLOCK)
+        offsets = tl.arange(0, BLOCK)
+        total = tl.zeros((BLOCK, BLOCK), tl.float32)
+        for start in range(0, k, BLOCK):
+            a_values = tl.load(a + row[:, None] * k + start + offsets[None, :], mask=(row[:, None] < m) & (start + offsets[None, :] < k), other=0.0)
+            b_values = tl.load(b + (start + offsets[:, None]) * n + column[None, :], mask=(start + offsets[:, None] < k) & (column[None, :] < n), other=0.0)
+            total += tl.dot(a_values, b_values)
+        tl.store(c + row[:, None] * n + column[None, :], total, mask=(row[:, None] < m) & (column[None, :] < n))
+
+    a = torch.tensor(left, dtype=torch.float32, device="cuda")
+    b = torch.tensor(right, dtype=torch.float32, device="cuda")
+    output = torch.empty((m, n), dtype=torch.float32, device="cuda")
+    kernel[(triton.cdiv(m, 16), triton.cdiv(n, 16))](a, b, output, m, n, k, BLOCK=16)
+    return output.cpu().tolist()
+
+
 def matmul_bias(
     left: Sequence[Sequence[float]], right: Sequence[Sequence[float]], bias: Sequence[float]
 ) -> Matrix:

@@ -24,6 +24,7 @@ python3 benchmark.py --m 24 --k 32 --n 16 --tiles 4,8 --repeats 3 --thresholds t
 python3 benchmark.py --m 24 --k 32 --n 16 --backend numpy
 python3 benchmark.py --m 24 --k 32 --n 16 --backend torch
 python3 benchmark.py --m 24 --k 32 --n 16 --backend torch-compile
+python3 benchmark.py --m 24 --k 32 --n 16 --backend triton
 python3 -m unittest -v
 ```
 
@@ -54,5 +55,10 @@ and is selected with `--backend torch-compile`. It requires PyTorch 2.0 or
 newer. The first correctness run triggers compilation before timed repeats, so
 the reported backend timing excludes first-use compilation but includes CPU
 tensor conversion.
+
+The optional Triton backend is selected with `--backend triton`. It requires
+CUDA-capable PyTorch and Triton (`python3 -m pip install torch triton`) and
+uses a 16x16 float32 blocked kernel; its timing includes host-to-device tensor
+conversion and the final result transfer back to CPU.
 
 See [ROADMAP.md](ROADMAP.md) for kernel and backend milestones.
