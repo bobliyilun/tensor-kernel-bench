@@ -19,4 +19,4 @@
 - [x] Add optional PyTorch eager backend
 - [x] Add optional torch.compile comparison
 - [x] Add optional Triton matmul kernel
-- [ ] Publish backend comparison with hardware metadata
+- [x] Publish backend comparison with hardware metadata

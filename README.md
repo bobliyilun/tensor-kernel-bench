@@ -62,3 +62,5 @@ uses a 16x16 float32 blocked kernel; its timing includes host-to-device tensor
 conversion and the final result transfer back to CPU.
 
 See [ROADMAP.md](ROADMAP.md) for kernel and backend milestones.
+See [RESULTS.md](RESULTS.md) for the current backend comparison and its exact
+hardware metadata.
